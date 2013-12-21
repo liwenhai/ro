@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dm;
 using System.Xml.Serialization;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace 大漠
 {
@@ -69,7 +70,7 @@ namespace 大漠
         dmsoft opTool;
         public ConfigInfo configInfo;
         public RichTextBox mssageBox;
-        
+        Thread thread;
         
         /// <summary>
         /// 构造函数
@@ -105,9 +106,11 @@ namespace 大漠
         /// teleType=0 使用苍蝇翅膀瞬间移动 teleType=1 使用技能瞬间移动
         public void teleport(bool useSkill,KeyEnum teleKey)
         {
+            addLog("瞬间移动", 0);
+            Thread.Sleep(1000);
             opTool.KeyPress((int)teleKey);    
             if(useSkill){
-                opTool.delay(1000);
+                Thread.Sleep(1000);
                 keyPress(KeyEnum.Enter); 
             }
         }
@@ -137,7 +140,7 @@ namespace 大漠
         /// <param name="skillKey"></param>
         public void useSkillForMe(KeyEnum skillKey){
             keyPress(skillKey);
-            opTool.delay(100);
+            Thread.Sleep(100);
             mouseMoveToCenter();
             opTool.LeftClick();
         }
@@ -186,7 +189,10 @@ namespace 大漠
         public List<PicInfo> FindPicList(string pics)
         {
             List<PicInfo> list = new List<PicInfo>();
-            string res = opTool.FindPicEx(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "000000", 0.6, 0);
+            string res = opTool.FindPicEx(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "000000", 0.7, 0);
+            if (res.Trim() == "") {
+                return list;
+            }
             var strList = res.Split('|');
             var picsArray = pics.Split('|');
             for (int i = 0; i < strList.Length; i++)
@@ -203,11 +209,14 @@ namespace 大漠
         /// 检查并使用辅助技能
         /// </summary>
         public void checkAndUesAssist(List<AssistItemAndSkillInfo> isInfo) {
+            addLog("isInfo.Count" + isInfo.Count, -1);
             for (int i = 0; i < isInfo.Count; i++)
             {
                 TimeSpan timeSpan = DateTime.Now - isInfo[i].lastUseTime;
+                addLog("timeSpan" + timeSpan, -1);
                 if (timeSpan.TotalSeconds > isInfo[i].skillLastTime && isInfo[i].isUse)
                 {
+                    addLog("使用技能" + isInfo[i].skillName, 0);
                     if (isInfo[i].isUseForMe)
                     {
                         //向自己使用技能
@@ -217,8 +226,11 @@ namespace 大漠
                         //直接使用技能
                         keyPress(isInfo[i].key);
                     }
+                    isInfo[i].lastUseTime = DateTime.Now;
                     //按照CD时间延迟
-                    opTool.delay(isInfo[i].skillDCTime);
+                    addLog("opTool.delay_start",-1);
+                    Thread.Sleep(isInfo[i].skillDCTime * 1000);
+                    addLog("opTool.delay_end",-1);
                 }     
             }                
         }
@@ -229,11 +241,14 @@ namespace 大漠
         /// <param name="useSkill"></param>
         /// <param name="hpKey"></param>
         public void addHp(bool useSkill,KeyEnum hpKey) {
+            
             if (useSkill)
             {
+                addLog("Hp过低使用治愈术", 0);
                 useSkillForMe(hpKey);
             }
             else {
+                addLog("Hp过低使用HP药物", 0);
                 keyPress(hpKey);
             }    
         }
@@ -246,10 +261,17 @@ namespace 大漠
                     break;
                 }
                 var itemList = FindPicList(itemPics);
+                addLog("检查地上掉落的物品数量" + itemList.Count, -1);
+                if (itemList.Count < 1) {
+                    break;
+                }
+               
                 for (int i = 0; i < itemList.Count; i++)
                 {
+                    addLog("发现物品开始捡物" + itemList[i].picName, 0);
                     opTool.MoveTo(itemList[i].positionX, itemList[i].positionY);
-                    opTool.delay(3000);
+                    Thread.Sleep(3000);
+                    //opTool.delay(3000);
                     opTool.LeftClick();
                 }
                 outTimes++;
@@ -258,40 +280,69 @@ namespace 大漠
 
         public void findAndAtkMonster(string monPics,bool useSkill,KeyEnum key) {
             int outTimes = 0;
+            addLog("1", -1);
             while (true)
             {
+                addLog("2", -1);
                 if (outTimes >= 4)
                 {
                     break;
                 }
+                addLog("3", -1);
                 var itemList = FindPicList(monPics);
+                addLog("检查怪物数量" + itemList.Count, -1);
+                if (itemList.Count < 1) {
+                    break;
+                }
                 for (int i = 0; i < itemList.Count; i++)
                 {
+                    addLog("发现怪物打怪" + itemList[i].picName, 0);
                     atkMonster(itemList[i].positionX, itemList[i].positionY, useSkill, key);
                 }
                 outTimes++;
             }
         }
 
+        public void start() {
+            addLog("开始挂机", 0);
+            thread = new Thread(new ThreadStart(processStep));
+            thread.Start();
+        }
+
+        public void stop()
+        {
+            addLog("停止挂机", 0);
+            thread.Abort();
+        }
+
         /// <summary>
         /// 挂机流程
         /// </summary>
         public void processStep() {
-            addLog("初始化数据", 0);
-            //检查并使用辅助技能
-            checkAndUesAssist(configInfo.assistItemAndSkillInfo);
-            //Hp过低时开始补血
-            if(isHpLow()){
-                addHp(configInfo.hpUseSkill,configInfo.hpKey);                    
+            while (true) {
+                //检查并使用辅助技能
+                checkAndUesAssist(configInfo.assistItemAndSkillInfo);
+                //Hp过低时开始补血
+                addLog("开始检查血量是否过低", -1);
+                if (isHpLow())
+                {
+                    addLog("血量过低", -1);
+                    addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                }
+                addLog("开始检查捡物设置", -1);
+                //有捡物设定时开始捡物
+                if (configInfo.isPickUpItem)
+                {
+                    addLog("开始捡物", -1);
+                    pickUpItem(configInfo.itemsPic);
+                }
+                addLog("开始寻怪打怪", -1);
+                //寻找怪物并打怪 最多连续打四次防止卡图
+                findAndAtkMonster(configInfo.monsPic, configInfo.atkUseSkill, configInfo.atkSkillKey);
+                //瞬间移动
+                teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
+                //addLog("step结束", -1);
             }
-            //有捡物设定时开始捡物
-            if(configInfo.isPickUpItem){
-                pickUpItem(configInfo.itemsPic);
-            }
-            //寻找怪物并打怪 最多连续打四次防止卡图
-            findAndAtkMonster(configInfo.monsPic,configInfo.atkUseSkill,configInfo.atkSkillKey);
-            //瞬间移动
-            teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
         }
 
         public void keyPress(KeyEnum key)
@@ -306,7 +357,11 @@ namespace 大漠
         /// <param name="logType">日志类型 0:普通 -1:调试</param>
         public void addLog(string msg,int logType) { 
             //messageInfoBox
-            mssageBox.Text += DateTime.Now.ToShortTimeString() + "_" + msg;
+            mssageBox.AppendText(DateTime.Now.ToString("HH:mm:ss") + " - " + msg + "\r\n");
+            mssageBox.SelectionStart = mssageBox.Text.Length;
+            mssageBox.ScrollToCaret(); 
         }
+
+
     }
 }

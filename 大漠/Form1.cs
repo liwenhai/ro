@@ -17,9 +17,11 @@ namespace 大漠
 {
     public partial class Form1 : Form
     {
+        BaseAction baseAction;
         public Form1()
         {
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;
             for (int i = 1; i < 13; i++)
             {
                 atkSkillInput.Items.Add("F" + i);
@@ -111,10 +113,10 @@ namespace 大漠
             config.itemsPic = config.itemsPic.Substring(0, config.itemsPic.Length - 1);
             try
             {
-                BaseAction action = new BaseAction("仙境传说");
-                action.configInfo = config;
-                action.mssageBox = messageInfoBox;
-                action.processStep();
+                baseAction = new BaseAction("仙境传说");
+                baseAction.configInfo = config;
+                baseAction.mssageBox = messageInfoBox;
+                baseAction.start();
             }
             catch (Exception h)
             {
@@ -219,6 +221,48 @@ namespace 大漠
                 configInfo = (ConfigInfo)formatter.Deserialize(fs);
             }
             return configInfo;
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+        }
+
+        string key = "";
+        protected override bool ProcessDialogKey(Keys keyData)
+        {
+
+
+            if (key == "Control"&&keyData.ToString().IndexOf("Alt") >= 0)
+            {
+                button2_Click(null, null);   
+            }
+
+            if (key == "Control" && keyData.ToString().IndexOf("Pause") >= 0)
+            {
+                baseAction.stop();
+            }
+
+            if (keyData.ToString().IndexOf("Control") >= 0)
+            {
+                key = "Control";
+            }
+            else
+            {
+                key = "";
+            }
+            
+            return false;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            baseAction.stop();
         }
         
                       
