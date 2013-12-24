@@ -1,0 +1,22 @@
+c:\users\liwenhai\documents\visual studio 2010\Projects\设置怪物属性\设置怪物属性\bin\Debug\设置怪物属性.exe
+c:\users\liwenhai\documents\visual studio 2010\Projects\设置怪物属性\设置怪物属性\bin\Debug\设置怪物属性.pdb
+c:\users\liwenhai\documents\visual studio 2010\Projects\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.Form1.resources
+c:\users\liwenhai\documents\visual studio 2010\Projects\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.Properties.Resources.resources
+c:\users\liwenhai\documents\visual studio 2010\Projects\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.csproj.GenerateResource.Cache
+c:\users\liwenhai\documents\visual studio 2010\Projects\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.exe
+c:\users\liwenhai\documents\visual studio 2010\Projects\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.pdb
+D:\liwenhai\仙境传说前台WG\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.exe
+D:\liwenhai\仙境传说前台WG\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.pdb
+D:\liwenhai\仙境传说前台WG\设置怪物属性\设置怪物属性\bin\Debug\设置怪物属性.exe
+D:\liwenhai\仙境传说前台WG\设置怪物属性\设置怪物属性\bin\Debug\设置怪物属性.pdb
+D:\liwenhai\仙境传说前台WG\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.Form1.resources
+D:\liwenhai\仙境传说前台WG\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.Properties.Resources.resources
+D:\liwenhai\仙境传说前台WG\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.csproj.GenerateResource.Cache
+D:\liwenhai\ROModify\设置怪物属性\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.exe
+D:\liwenhai\ROModify\设置怪物属性\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.pdb
+D:\liwenhai\ROModify\设置怪物属性\设置怪物属性\设置怪物属性\bin\Debug\设置怪物属性.exe
+D:\liwenhai\ROModify\设置怪物属性\设置怪物属性\设置怪物属性\bin\Debug\设置怪物属性.pdb
+D:\liwenhai\ROModify\设置怪物属性\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.Form1.resources
+D:\liwenhai\ROModify\设置怪物属性\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.Properties.Resources.resources
+D:\liwenhai\ROModify\设置怪物属性\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.csproj.GenerateResource.Cache
+D:\liwenhai\仙境传说前台WG\设置怪物属性\设置怪物属性\obj\x86\Debug\设置怪物属性.csprojResolveAssemblyReference.cache
