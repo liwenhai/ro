@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.atkLastTimeNum = new System.Windows.Forms.NumericUpDown();
             this.isAtkUseSkillCheckBox = new System.Windows.Forms.CheckBox();
             this.atkSkillInput = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -42,10 +44,13 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button4 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.messageInfoBox = new System.Windows.Forms.RichTextBox();
             this.button3 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.atkLastTimeNum)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -54,19 +59,42 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.atkLastTimeNum);
             this.groupBox1.Controls.Add(this.isAtkUseSkillCheckBox);
             this.groupBox1.Controls.Add(this.atkSkillInput);
             this.groupBox1.Location = new System.Drawing.Point(11, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(149, 47);
+            this.groupBox1.Size = new System.Drawing.Size(228, 47);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "战斗信息按键设置";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(151, 21);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(53, 12);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "持续时间";
+            // 
+            // atkLastTimeNum
+            // 
+            this.atkLastTimeNum.Location = new System.Drawing.Point(117, 16);
+            this.atkLastTimeNum.Name = "atkLastTimeNum";
+            this.atkLastTimeNum.Size = new System.Drawing.Size(28, 21);
+            this.atkLastTimeNum.TabIndex = 8;
+            this.atkLastTimeNum.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            // 
             // isAtkUseSkillCheckBox
             // 
             this.isAtkUseSkillCheckBox.AutoSize = true;
-            this.isAtkUseSkillCheckBox.Location = new System.Drawing.Point(96, 20);
+            this.isAtkUseSkillCheckBox.Location = new System.Drawing.Point(63, 20);
             this.isAtkUseSkillCheckBox.Name = "isAtkUseSkillCheckBox";
             this.isAtkUseSkillCheckBox.Size = new System.Drawing.Size(48, 16);
             this.isAtkUseSkillCheckBox.TabIndex = 7;
@@ -78,16 +106,16 @@
             this.atkSkillInput.FormattingEnabled = true;
             this.atkSkillInput.Location = new System.Drawing.Point(19, 18);
             this.atkSkillInput.Name = "atkSkillInput";
-            this.atkSkillInput.Size = new System.Drawing.Size(67, 20);
+            this.atkSkillInput.Size = new System.Drawing.Size(38, 20);
             this.atkSkillInput.TabIndex = 0;
             // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.isHpUseSkillCheckBox);
             this.groupBox2.Controls.Add(this.hpSkillInput);
-            this.groupBox2.Location = new System.Drawing.Point(165, 12);
+            this.groupBox2.Location = new System.Drawing.Point(245, 12);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(148, 47);
+            this.groupBox2.Size = new System.Drawing.Size(108, 47);
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Hp回复按键设置";
@@ -95,7 +123,7 @@
             // isHpUseSkillCheckBox
             // 
             this.isHpUseSkillCheckBox.AutoSize = true;
-            this.isHpUseSkillCheckBox.Location = new System.Drawing.Point(94, 22);
+            this.isHpUseSkillCheckBox.Location = new System.Drawing.Point(56, 22);
             this.isHpUseSkillCheckBox.Name = "isHpUseSkillCheckBox";
             this.isHpUseSkillCheckBox.Size = new System.Drawing.Size(48, 16);
             this.isHpUseSkillCheckBox.TabIndex = 6;
@@ -107,16 +135,16 @@
             this.hpSkillInput.FormattingEnabled = true;
             this.hpSkillInput.Location = new System.Drawing.Point(17, 20);
             this.hpSkillInput.Name = "hpSkillInput";
-            this.hpSkillInput.Size = new System.Drawing.Size(67, 20);
+            this.hpSkillInput.Size = new System.Drawing.Size(33, 20);
             this.hpSkillInput.TabIndex = 5;
             // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.isTeleUseSkillCheckBox);
             this.groupBox3.Controls.Add(this.teleSkillInput);
-            this.groupBox3.Location = new System.Drawing.Point(320, 12);
+            this.groupBox3.Location = new System.Drawing.Point(359, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(144, 47);
+            this.groupBox3.Size = new System.Drawing.Size(104, 47);
             this.groupBox3.TabIndex = 5;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "瞬移动按键设置";
@@ -124,7 +152,7 @@
             // isTeleUseSkillCheckBox
             // 
             this.isTeleUseSkillCheckBox.AutoSize = true;
-            this.isTeleUseSkillCheckBox.Location = new System.Drawing.Point(94, 24);
+            this.isTeleUseSkillCheckBox.Location = new System.Drawing.Point(56, 24);
             this.isTeleUseSkillCheckBox.Name = "isTeleUseSkillCheckBox";
             this.isTeleUseSkillCheckBox.Size = new System.Drawing.Size(48, 16);
             this.isTeleUseSkillCheckBox.TabIndex = 7;
@@ -134,9 +162,9 @@
             // teleSkillInput
             // 
             this.teleSkillInput.FormattingEnabled = true;
-            this.teleSkillInput.Location = new System.Drawing.Point(17, 22);
+            this.teleSkillInput.Location = new System.Drawing.Point(15, 20);
             this.teleSkillInput.Name = "teleSkillInput";
-            this.teleSkillInput.Size = new System.Drawing.Size(67, 20);
+            this.teleSkillInput.Size = new System.Drawing.Size(35, 20);
             this.teleSkillInput.TabIndex = 5;
             // 
             // groupBox4
@@ -180,6 +208,8 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.textBox1);
+            this.groupBox5.Controls.Add(this.button4);
             this.groupBox5.Controls.Add(this.flowLayoutPanel1);
             this.groupBox5.Controls.Add(this.button1);
             this.groupBox5.Location = new System.Drawing.Point(9, 64);
@@ -188,6 +218,25 @@
             this.groupBox5.TabIndex = 9;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "物品与辅助技能设置";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(311, 157);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 21);
+            this.textBox1.TabIndex = 10;
+            this.textBox1.Text = "0.8";
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(437, 154);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.TabIndex = 9;
+            this.button4.Text = "button4";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button2
             // 
@@ -207,6 +256,7 @@
             this.messageInfoBox.Size = new System.Drawing.Size(611, 87);
             this.messageInfoBox.TabIndex = 11;
             this.messageInfoBox.Text = "";
+            this.messageInfoBox.TextChanged += new System.EventHandler(this.messageInfoBox_TextChanged);
             // 
             // button3
             // 
@@ -234,11 +284,11 @@
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
             this.Text = "看看";
-            this.TopMost = true;
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Form1_KeyPress);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.atkLastTimeNum)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -246,6 +296,7 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -269,6 +320,10 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.RichTextBox messageInfoBox;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown atkLastTimeNum;
     }
 }
 

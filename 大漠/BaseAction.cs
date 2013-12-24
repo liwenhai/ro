@@ -7,6 +7,9 @@ using Dm;
 using System.Xml.Serialization;
 using System.Windows.Forms;
 using System.Threading;
+using System.IO;
+using QMDISPATCHLib;
+using System.Drawing;
 
 namespace 大漠
 {
@@ -24,6 +27,7 @@ namespace 大漠
         public KeyEnum teleSkillKey;
         public string itemsPic;
         public string monsPic;
+        public int atkLastTimeNum = 4;
     }
 
     class PicInfo{
@@ -107,12 +111,13 @@ namespace 大漠
         public void teleport(bool useSkill,KeyEnum teleKey)
         {
             addLog("瞬间移动", 0);
-            Thread.Sleep(1000);
+            //Thread.Sleep(1000);
             opTool.KeyPress((int)teleKey);    
             if(useSkill){
-                Thread.Sleep(1000);
+                Thread.Sleep(1500);
                 keyPress(KeyEnum.Enter); 
             }
+            Thread.Sleep(1500);
         }
         
         /// <summary>
@@ -131,7 +136,8 @@ namespace 大漠
                 opTool.KeyDown((int)KeyEnum.Ctrl); 
                 opTool.LeftClick();
                 opTool.KeyUp((int)KeyEnum.Ctrl); 
-            }  
+            }
+            Thread.Sleep(configInfo.atkLastTimeNum * 1000);
         }
 
         /// <summary>
@@ -157,7 +163,8 @@ namespace 大漠
         /// <param name="y"></param>
         /// <param name="color"></param>
         /// <returns></returns>
-        public bool findColor(int x,int y,string color) { 
+        public bool findColor(int x,int y,string color) {
+            var tt = opTool.GetColor(x, y);
             if (opTool.GetColor(x, y) == color) {
                 return true; 
             }
@@ -169,7 +176,7 @@ namespace 大漠
         /// </summary>
         /// <returns></returns>
         public bool isHpLow() {
-            return findColor(winLeftTopX + 158 - 20, winLeftTopY + 59, "f7f7f7");
+            return findColor(winLeftTopX + 158 - 20, winLeftTopY + 84, "f7f7f7");
         }
 
         /// <summary>
@@ -178,7 +185,7 @@ namespace 大漠
         /// <returns></returns>
         public bool isSpLow()
         {
-            return findColor(winLeftTopX + 65, winLeftTopY + 74, "f7f7f7");
+            return findColor(winLeftTopX + 65, winLeftTopY + 99, "f7f7f7");
         }
 
         /// <summary>
@@ -189,19 +196,90 @@ namespace 大漠
         public List<PicInfo> FindPicList(string pics)
         {
             List<PicInfo> list = new List<PicInfo>();
-            string res = opTool.FindPicEx(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "000000", 0.7, 0);
-            if (res.Trim() == "") {
-                return list;
-            }
-            var strList = res.Split('|');
-            var picsArray = pics.Split('|');
-            for (int i = 0; i < strList.Length; i++)
+            //string res = opTool.FindPicE(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "000000", 0.6, 0);
+            //if (res.Trim() == "") {
+            //    return list;
+            //}
+            //var strList = res.Split('|');
+            //var picsArray = pics.Split('|');
+            //for (int i = 0; i < strList.Length; i++)
+            //{
+            //    PicInfo oneMonster = new PicInfo();
+            //    oneMonster.positionX = int.Parse(strList[i].Split(',')[1]);
+            //    oneMonster.positionY = int.Parse(strList[i].Split(',')[2]);
+            //    oneMonster.picName = picsArray[int.Parse(strList[i].Split(',')[0])];
+            //    list.Add(oneMonster);
+            //}
+            //var picsarray = pics.Split('|');
+            //for (int i = 0; i < picsarray.Length; i++)
+            //{
+            //    object x;
+            //    object y;
+            //    var isfind = opTool.FindPic(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "000000", 0.6, 0,out x,out y);
+            //    int xx = (int)x;
+            //    int yy = (int)y;
+            //    if (xx > 0 && yy > 0)
+            //    {
+            //        PicInfo oneMonster = new PicInfo();
+            //        oneMonster.positionX = xx;
+            //        oneMonster.positionY = yy;
+            //        oneMonster.picName = picsarray[i];
+            //        list.Add(oneMonster);
+            //        break;
+            //    }
+            //}
+
+            //QMFunctionClass ff = new QMFunctionClass();
+            //var picsarray = pics.Split('|');
+            //for (int i = 0; i < picsarray.Length; i++)
+            //{
+            //    //object x;
+            //    //object y;
+            //    //var isfind = opTool.FindPic(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "000000", 0.6, 0, out x, out y);
+            //    int d = ff.FindPic(0, 0, 1280, 800, pics, 0.5f);
+
+            //    int xx = d / 8192;
+            //    int yy = d % 8192;
+            //    if (xx > 0 && yy > 0)
+            //    {
+            //        PicInfo oneMonster = new PicInfo();
+            //        oneMonster.positionX = xx;
+            //        oneMonster.positionY = yy;
+            //        oneMonster.picName = picsarray[i];
+            //        list.Add(oneMonster);
+            //        break;
+            //    }
+            //}
+
+
+            var picsarray = pics.Split('|');
+            for (int i = 0; i < picsarray.Length; i++)
             {
-                PicInfo oneMonster = new PicInfo();
-                oneMonster.positionX = int.Parse(strList[i].Split(',')[1]);
-                oneMonster.positionY = int.Parse(strList[i].Split(',')[2]);
-                oneMonster.picName = picsArray[int.Parse(strList[i].Split(',')[0])];
+                //Bitmap bmp = BmpColor.CopyScreen(new Rectangle() { Y = winLeftTopY, X = winLeftTopX, Width = winRightDownX, Height = winRightDownY });
+
+                //Bitmap bmp1 = new Bitmap(picsarray[i]);
+
+                Bitmap bmp = BmpColor.CopyScreen(new Rectangle() { Y = 0, X = 0, Width = 1280, Height = 800 });
+
+                Bitmap bmp1 = new Bitmap(picsarray[i]);
+                var tt = BmpColor.FindPic(0, 0, 1280, 800, bmp, bmp1, 1);
+                
+                //var tt = BmpColor.FindPic(0, 0, 1280, 800, bmp, bmp1, 1);
+                for (int j = 0; j < tt.Count; j++)
+                {
+                    PicInfo oneMonster = new PicInfo();
+                    oneMonster.positionX = tt[j].X;
+                    oneMonster.positionY = tt[j].X;
+                    oneMonster.picName = picsarray[i];
+                    list.Add(oneMonster);    
+                }
+                bmp.Dispose();
+                bmp1.Dispose();
             }
+
+
+            
+            
             return list;
         }
 
@@ -268,10 +346,9 @@ namespace 大漠
                
                 for (int i = 0; i < itemList.Count; i++)
                 {
-                    addLog("发现物品开始捡物" + itemList[i].picName, 0);
+                    addLog("捡物-" +Path.GetFileName(itemList[i].picName), 0);
                     opTool.MoveTo(itemList[i].positionX, itemList[i].positionY);
                     Thread.Sleep(3000);
-                    //opTool.delay(3000);
                     opTool.LeftClick();
                 }
                 outTimes++;
@@ -286,17 +363,18 @@ namespace 大漠
                 addLog("2", -1);
                 if (outTimes >= 4)
                 {
+                    addLog("跳出循环", -1);
                     break;
                 }
                 addLog("3", -1);
                 var itemList = FindPicList(monPics);
-                addLog("检查怪物数量" + itemList.Count, -1);
+                addLog("发现怪物：" + itemList.Count,0);
                 if (itemList.Count < 1) {
                     break;
                 }
                 for (int i = 0; i < itemList.Count; i++)
                 {
-                    addLog("发现怪物打怪" + itemList[i].picName, 0);
+                    addLog("打怪-" + Path.GetFileName(itemList[i].picName), 0);
                     atkMonster(itemList[i].positionX, itemList[i].positionY, useSkill, key);
                 }
                 outTimes++;
@@ -357,6 +435,10 @@ namespace 大漠
         /// <param name="logType">日志类型 0:普通 -1:调试</param>
         public void addLog(string msg,int logType) { 
             //messageInfoBox
+            if (logType == -1)
+            {
+                return;
+            }
             mssageBox.AppendText(DateTime.Now.ToString("HH:mm:ss") + " - " + msg + "\r\n");
             mssageBox.SelectionStart = mssageBox.Text.Length;
             mssageBox.ScrollToCaret(); 

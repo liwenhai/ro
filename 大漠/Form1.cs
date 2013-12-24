@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Runtime.Serialization.Formatters.Soap;
 using Dm;
 using System.Xml.Serialization;
+using QMDISPATCHLib;
 
 
 namespace 大漠
@@ -43,6 +44,7 @@ namespace 大漠
                 hpSkillInput.Text = config.hpKey.ToString();
                 isHpUseSkillCheckBox.Checked = config.hpUseSkill;
                 isPickUpCheckBox.Checked = config.isPickUpItem;
+                atkLastTimeNum.Value = config.atkLastTimeNum;
 
             }
             catch (Exception)
@@ -93,6 +95,7 @@ namespace 大漠
             config.hpKey = getKeyEnumFromString(hpSkillInput.Text);
             config.hpUseSkill = isHpUseSkillCheckBox.Checked;
             config.isPickUpItem = isPickUpCheckBox.Checked;
+            config.atkLastTimeNum = decimal.ToInt32(atkLastTimeNum.Value);
             Serialize(config);
 
             var files = Directory.GetFiles(System.Windows.Forms.Application.StartupPath+"\\Pic");
@@ -263,6 +266,41 @@ namespace 大漠
         private void button3_Click(object sender, EventArgs e)
         {
             baseAction.stop();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //dmsoft opTool = new dmsoft();
+            //QMFunctionClass ff = new QMFunctionClass();
+            //int d = ff.FindPic(0, 0, 1280, 800,System.Windows.Forms.Application.StartupPath + "\\Pic\\atk_2.bmp",0.5f);
+
+            //opTool.Capture(0, 0, 1280, 800, "d:\\tt.bmp");
+            Bitmap bmp = BmpColor.CopyScreen(new Rectangle() { Y = 0, X = 0, Width = 1280, Height = 800 });
+            
+            Bitmap bmp1 = new Bitmap(System.Windows.Forms.Application.StartupPath + "\\Pic\\atk_2.bmp");
+            var tt = BmpColor.FindPic(0, 0, 1280, 800, bmp, bmp1, 1);
+            //var tt = opTool.FindPicEx(0, 0, 1280, 800, System.Windows.Forms.Application.StartupPath + "\\Pic\\atk_2.bmp|" + System.Windows.Forms.Application.StartupPath + "\\Pic\\atk_white.bmp", "000000", double.Parse(textBox1.Text), 0);
+            if (tt.Count > 0)
+            {
+                messageInfoBox.AppendText(tt[0].X + " " + tt[0].Y + "!!\r\n");
+            }
+            
+                //else {
+            //int xx = d / 8192;
+            //int yy = d % 8192;
+            //messageInfoBox.AppendText(tt[]+ " " + yy + "!!\r\n");
+            //}
+            
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+           
+        }
+
+        private void messageInfoBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
         
                       
