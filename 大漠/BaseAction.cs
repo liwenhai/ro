@@ -196,26 +196,27 @@ namespace 大漠
         public List<PicInfo> FindPicList(string pics)
         {
             List<PicInfo> list = new List<PicInfo>();
-            //string res = opTool.FindPicE(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "000000", 0.6, 0);
-            //if (res.Trim() == "") {
-            //    return list;
-            //}
-            //var strList = res.Split('|');
-            //var picsArray = pics.Split('|');
-            //for (int i = 0; i < strList.Length; i++)
-            //{
-            //    PicInfo oneMonster = new PicInfo();
-            //    oneMonster.positionX = int.Parse(strList[i].Split(',')[1]);
-            //    oneMonster.positionY = int.Parse(strList[i].Split(',')[2]);
-            //    oneMonster.picName = picsArray[int.Parse(strList[i].Split(',')[0])];
-            //    list.Add(oneMonster);
-            //}
+            string res = opTool.FindPicEx(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "505050", 0.7, 0);
+            if (res.Trim() == "")
+            {
+                return list;
+            }
+            var strList = res.Split('|');
+            var picsArray = pics.Split('|');
+            for (int i = 0; i < strList.Length; i++)
+            {
+                PicInfo oneMonster = new PicInfo();
+                oneMonster.positionX = int.Parse(strList[i].Split(',')[1]);
+                oneMonster.positionY = int.Parse(strList[i].Split(',')[2]);
+                oneMonster.picName = picsArray[int.Parse(strList[i].Split(',')[0])];
+                list.Add(oneMonster);
+            }
             //var picsarray = pics.Split('|');
             //for (int i = 0; i < picsarray.Length; i++)
             //{
             //    object x;
             //    object y;
-            //    var isfind = opTool.FindPic(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "000000", 0.6, 0,out x,out y);
+            //    var isfind = opTool.FindPic(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "707070", 0.6, 0, out x, out y);
             //    int xx = (int)x;
             //    int yy = (int)y;
             //    if (xx > 0 && yy > 0)
@@ -252,30 +253,30 @@ namespace 大漠
             //}
 
 
-            var picsarray = pics.Split('|');
-            for (int i = 0; i < picsarray.Length; i++)
-            {
-                //Bitmap bmp = BmpColor.CopyScreen(new Rectangle() { Y = winLeftTopY, X = winLeftTopX, Width = winRightDownX, Height = winRightDownY });
+            //var picsarray = pics.Split('|');
+            //for (int i = 0; i < picsarray.Length; i++)
+            //{
+            //    //Bitmap bmp = BmpColor.CopyScreen(new Rectangle() { Y = winLeftTopY, X = winLeftTopX, Width = winRightDownX, Height = winRightDownY });
 
-                //Bitmap bmp1 = new Bitmap(picsarray[i]);
+            //    //Bitmap bmp1 = new Bitmap(picsarray[i]);
 
-                Bitmap bmp = BmpColor.CopyScreen(new Rectangle() { Y = 0, X = 0, Width = 1280, Height = 800 });
+            //    Bitmap bmp = BmpColor.CopyScreen(new Rectangle() { Y = 0, X = 0, Width = 1280, Height = 800 });
 
-                Bitmap bmp1 = new Bitmap(picsarray[i]);
-                var tt = BmpColor.FindPic(0, 0, 1280, 800, bmp, bmp1, 1);
+            //    Bitmap bmp1 = new Bitmap(picsarray[i]);
+            //    var tt = BmpColor.FindPic(0, 0, 1280, 800, bmp, bmp1, 1);
                 
-                //var tt = BmpColor.FindPic(0, 0, 1280, 800, bmp, bmp1, 1);
-                for (int j = 0; j < tt.Count; j++)
-                {
-                    PicInfo oneMonster = new PicInfo();
-                    oneMonster.positionX = tt[j].X;
-                    oneMonster.positionY = tt[j].X;
-                    oneMonster.picName = picsarray[i];
-                    list.Add(oneMonster);    
-                }
-                bmp.Dispose();
-                bmp1.Dispose();
-            }
+            //    //var tt = BmpColor.FindPic(0, 0, 1280, 800, bmp, bmp1, 1);
+            //    for (int j = 0; j < tt.Count; j++)
+            //    {
+            //        PicInfo oneMonster = new PicInfo();
+            //        oneMonster.positionX = tt[j].X;
+            //        oneMonster.positionY = tt[j].X;
+            //        oneMonster.picName = picsarray[i];
+            //        list.Add(oneMonster);    
+            //    }
+            //    bmp.Dispose();
+            //    bmp1.Dispose();
+            //}
 
 
             
@@ -372,7 +373,7 @@ namespace 大漠
                 if (itemList.Count < 1) {
                     break;
                 }
-                for (int i = 0; i < itemList.Count; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     addLog("打怪-" + Path.GetFileName(itemList[i].picName), 0);
                     atkMonster(itemList[i].positionX, itemList[i].positionY, useSkill, key);
