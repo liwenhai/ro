@@ -71,6 +71,7 @@ namespace 大漠
                 teleDelayTimeNum.Value = (decimal)config.teleDelayTime;
                 monsterColorSimileNum.Text = config.monsterColorSimile.Trim() ;
                 monsterSharpSimilerNum.Value = (decimal)config.monsterSharpSimiler;
+                atkFlyTimesNum.Value = (decimal)config.atkFlyTimes;
             }
             catch (Exception)
             {
@@ -127,7 +128,8 @@ namespace 大漠
             config.monsterFlyCount = decimal.ToInt32(monsterFlyCountNum.Value);
             config.teleDelayTime = decimal.ToDouble(teleDelayTimeNum.Value);
             config.monsterColorSimile = monsterColorSimileNum.Text.Trim();
-            config.monsterSharpSimiler = decimal.ToDouble(monsterSharpSimilerNum.Value); 
+            config.monsterSharpSimiler = decimal.ToDouble(monsterSharpSimilerNum.Value);
+            config.atkFlyTimes = decimal.ToInt32(atkFlyTimesNum.Value);
             Serialize(config);
 
             

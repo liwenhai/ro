@@ -34,6 +34,8 @@ namespace 大漠
         public double teleDelayTime = 2;
         public string monsterColorSimile = "505050";
         public double monsterSharpSimiler = 0.7;
+        public bool atkSkillFinishFly = false;
+        public int atkFlyTimes = 4;
     }
 
     class PicInfo{
@@ -130,7 +132,7 @@ namespace 大漠
         /// 打怪 物理攻击使用ctrl锁定打怪 技能攻击使用技能打怪
         /// </summary>
         /// <param name="useSkill">是否使用技能</param>
-        public void atkMonster(int monsterPostion_X, int monsterPostion_Y, bool useSkill,KeyEnum skillKey,string monsterName)
+        public bool atkMonster(int monsterPostion_X, int monsterPostion_Y, bool useSkill,KeyEnum skillKey,string monsterName)
         { 
             if(useSkill){
                 keyPress(skillKey);     
@@ -152,14 +154,15 @@ namespace 大漠
                 if (islag == 1)
                 {
                     addLog("检查到卡屏重新战斗",0);
-                    return;
+                    return false;
                 }
                 Thread.Sleep((configInfo.atkLastTimeNum - 2) * 1000);
             }
             else {
                 Thread.Sleep(configInfo.atkLastTimeNum * 1000);   
             }
-            
+
+            return true;
         }
 
         /// <summary>
@@ -343,10 +346,26 @@ namespace 大漠
             addLog("isInfo.Count" + isInfo.Count, -1);
             for (int i = 0; i < isInfo.Count; i++)
             {
+
+                
+                
                 TimeSpan timeSpan = DateTime.Now - isInfo[i].lastUseTime;
                 addLog("timeSpan" + timeSpan, -1);
                 if (timeSpan.TotalSeconds > isInfo[i].skillLastTime && isInfo[i].isUse)
                 {
+                    while (true)
+                    {
+                        var itemList = FindPicList(configInfo.monsPic, configInfo.monsterColorSimile, configInfo.monsterSharpSimiler);
+                        if (itemList.Count > 1)
+                        {
+                            addLog("使用辅助技能时发现怪物飞", 0);
+                            teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                     addLog("使用技能" + isInfo[i].skillName, 0);
                     if (isInfo[i].isUseForMe)
                     {
@@ -414,7 +433,7 @@ namespace 大漠
             while (true)
             {
                 addLog("2", -1);
-                if (outTimes >= 4)
+                if (outTimes >=configInfo.atkFlyTimes)
                 {
                     addLog("跳出循环", -1);
                     break;
@@ -439,9 +458,10 @@ namespace 大漠
                         continue;
                     }
                 }
+                bool isAtkSucess = true;
                 for (int i = 0; i < 1; i++)
                 {
-                    atkMonster(itemList[i].positionX, itemList[i].positionY, useSkill, key, itemList[i].picName);
+                    isAtkSucess = atkMonster(itemList[i].positionX, itemList[i].positionY, useSkill, key, itemList[i].picName);
                     //打完怪物后向右移动100像素 以免挡住捡物
                     if (configInfo.isPickUpItem) {
                         opTool.MoveTo(winLeftTopX + 400 + 100, winLeftTopY + 300);
@@ -455,7 +475,10 @@ namespace 大漠
                         teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
                     }
                 }
-                outTimes++;
+                if (isAtkSucess) {
+                    outTimes++;
+                }
+                
             }
 
         }

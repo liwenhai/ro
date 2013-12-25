@@ -150,6 +150,9 @@
     <Content Include="Pic\atk_4.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Pic\atk_5.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Pic\a_t_k_red.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
