@@ -12,6 +12,7 @@ using System.Runtime.Serialization.Formatters.Soap;
 using Dm;
 using System.Xml.Serialization;
 using QMDISPATCHLib;
+using System.Diagnostics;
 
 
 namespace 大漠
@@ -19,9 +20,11 @@ namespace 大漠
     public partial class Form1 : Form
     {
         BaseAction baseAction;
+        ConfigInfo config;
         public Form1()
         {
             InitializeComponent();
+            config = new ConfigInfo();
             CheckForIllegalCrossThreadCalls = false;
             for (int i = 1; i < 13; i++)
             {
@@ -35,6 +38,24 @@ namespace 大漠
         public void Init(){
             try
             {
+                
+                var files = Directory.GetFiles(System.Windows.Forms.Application.StartupPath + "\\Pic");
+                foreach (var item in files)
+                {
+                    if (item.IndexOf("atk") >= 0)
+                    {
+                        this.config.monsPic += item + "|";
+
+                    }
+
+                    if (item.IndexOf("pickup") >= 0)
+                    {
+                        this.config.itemsPic += item + "|";
+                    }
+                }
+                this.config.monsPic = this.config.monsPic.Substring(0, this.config.monsPic.Length - 1);
+                this.config.itemsPic = this.config.itemsPic.Substring(0, this.config.itemsPic.Length - 1);
+
                 var config = DeSerialize();
                 setAssInfo(config.assistItemAndSkillInfo);
                 atkSkillInput.Text = config.atkSkillKey.ToString();
@@ -45,7 +66,11 @@ namespace 大漠
                 isHpUseSkillCheckBox.Checked = config.hpUseSkill;
                 isPickUpCheckBox.Checked = config.isPickUpItem;
                 atkLastTimeNum.Value = config.atkLastTimeNum;
-
+                isCheckMonsterCountAndFlyBox.Checked = config.isCheckMonsterCountAndFly;
+                monsterFlyCountNum.Value = config.monsterFlyCount;
+                teleDelayTimeNum.Value = (decimal)config.teleDelayTime;
+                monsterColorSimileNum.Text = config.monsterColorSimile.Trim() ;
+                monsterSharpSimilerNum.Value = (decimal)config.monsterSharpSimiler;
             }
             catch (Exception)
             {
@@ -86,7 +111,9 @@ namespace 大漠
 
         private void button2_Click(object sender, EventArgs e)
         {
-            ConfigInfo config = new ConfigInfo();
+            button3.Enabled = true;
+            button2.Enabled = false;
+            //config = new ConfigInfo();
             config.assistItemAndSkillInfo = getAssInfo();
             config.atkSkillKey = getKeyEnumFromString(atkSkillInput.Text);
             config.atkUseSkill = isAtkUseSkillCheckBox.Checked;
@@ -96,24 +123,14 @@ namespace 大漠
             config.hpUseSkill = isHpUseSkillCheckBox.Checked;
             config.isPickUpItem = isPickUpCheckBox.Checked;
             config.atkLastTimeNum = decimal.ToInt32(atkLastTimeNum.Value);
+            config.isCheckMonsterCountAndFly = isCheckMonsterCountAndFlyBox.Checked;
+            config.monsterFlyCount = decimal.ToInt32(monsterFlyCountNum.Value);
+            config.teleDelayTime = decimal.ToDouble(teleDelayTimeNum.Value);
+            config.monsterColorSimile = monsterColorSimileNum.Text.Trim();
+            config.monsterSharpSimiler = decimal.ToDouble(monsterSharpSimilerNum.Value); 
             Serialize(config);
 
-            var files = Directory.GetFiles(System.Windows.Forms.Application.StartupPath+"\\Pic");
-            foreach (var item in files)
-            {
-                if (item.IndexOf("atk") >= 0)
-                {
-                    config.monsPic += item + "|";
-                    
-                }
-
-                if (item.IndexOf("pickup") >= 0)
-                {
-                    config.itemsPic += item + "|";
-                }
-            }
-            config.monsPic = config.monsPic.Substring(0, config.monsPic.Length - 1);
-            config.itemsPic = config.itemsPic.Substring(0, config.itemsPic.Length - 1);
+            
             try
             {
                 baseAction = new BaseAction("仙境传说");
@@ -265,32 +282,24 @@ namespace 大漠
 
         private void button3_Click(object sender, EventArgs e)
         {
+            button3.Enabled = false;
+            button2.Enabled =  true;
             baseAction.stop();
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            //dmsoft opTool = new dmsoft();
-            //QMFunctionClass ff = new QMFunctionClass();
-            //int d = ff.FindPic(0, 0, 1280, 800,System.Windows.Forms.Application.StartupPath + "\\Pic\\atk_2.bmp",0.5f);
+            dmsoft opTool = new dmsoft();
 
-            //opTool.Capture(0, 0, 1280, 800, "d:\\tt.bmp");
             Bitmap bmp = BmpColor.CopyScreen(new Rectangle() { Y = 0, X = 0, Width = 1280, Height = 800 });
-            
-            Bitmap bmp1 = new Bitmap(System.Windows.Forms.Application.StartupPath + "\\Pic\\atk_2.bmp");
-            var tt = BmpColor.FindPic(0, 0, 1280, 800, bmp, bmp1, 1);
-            //var tt = opTool.FindPicEx(0, 0, 1280, 800, System.Windows.Forms.Application.StartupPath + "\\Pic\\atk_2.bmp|" + System.Windows.Forms.Application.StartupPath + "\\Pic\\atk_white.bmp", "000000", double.Parse(textBox1.Text), 0);
-            if (tt.Count > 0)
-            {
-                messageInfoBox.AppendText(tt[0].X + " " + tt[0].Y + "!!\r\n");
-            }
-            
-                //else {
-            //int xx = d / 8192;
-            //int yy = d % 8192;
-            //messageInfoBox.AppendText(tt[]+ " " + yy + "!!\r\n");
-            //}
-            
+
+            Bitmap bmp1 = new Bitmap(System.Windows.Forms.Application.StartupPath + "\\Pic\\pickup_橡实.bmp");
+            Stopwatch sw = new Stopwatch();
+            sw.Start(); //计时开始
+            var tt = opTool.FindPicEx(0, 0, 1280, 800, config.monsPic, monsterColorSimileNum.Text, ((double)monsterSharpSimilerNum.Value), 0);
+            sw.Stop();   //计时结束
+            messageInfoBox.Text = "";
+            messageInfoBox.AppendText((sw.ElapsedMilliseconds).ToString()+"毫秒\r\n"+tt+ "!!\r\n"); 
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)

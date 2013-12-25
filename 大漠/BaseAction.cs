@@ -10,6 +10,7 @@ using System.Threading;
 using System.IO;
 using QMDISPATCHLib;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace 大漠
 {
@@ -28,6 +29,11 @@ namespace 大漠
         public string itemsPic;
         public string monsPic;
         public int atkLastTimeNum = 4;
+        public bool isCheckMonsterCountAndFly = false;
+        public int monsterFlyCount;
+        public double teleDelayTime = 2;
+        public string monsterColorSimile = "505050";
+        public double monsterSharpSimiler = 0.7;
     }
 
     class PicInfo{
@@ -114,17 +120,17 @@ namespace 大漠
             //Thread.Sleep(1000);
             opTool.KeyPress((int)teleKey);    
             if(useSkill){
-                Thread.Sleep(1500);
+                Thread.Sleep((int)configInfo.teleDelayTime*1000);
                 keyPress(KeyEnum.Enter); 
             }
-            Thread.Sleep(1500);
+            Thread.Sleep((int)configInfo.teleDelayTime * 1000);
         }
         
         /// <summary>
         /// 打怪 物理攻击使用ctrl锁定打怪 技能攻击使用技能打怪
         /// </summary>
         /// <param name="useSkill">是否使用技能</param>
-        public void atkMonster(int monsterPostion_X, int monsterPostion_Y, bool useSkill,KeyEnum skillKey)
+        public void atkMonster(int monsterPostion_X, int monsterPostion_Y, bool useSkill,KeyEnum skillKey,string monsterName)
         { 
             if(useSkill){
                 keyPress(skillKey);     
@@ -137,7 +143,23 @@ namespace 大漠
                 opTool.LeftClick();
                 opTool.KeyUp((int)KeyEnum.Ctrl); 
             }
-            Thread.Sleep(configInfo.atkLastTimeNum * 1000);
+            addLog("打怪-" + Path.GetFileName(monsterName), 0);
+            if (configInfo.atkLastTimeNum > 2)
+            {
+                //检查是否卡屏
+                int islag = opTool.IsDisplayDead(winLeftTopX + 300, winLeftTopY + 30, winLeftTopX + 300 + 10, winLeftTopY + 30 + 10, 2);
+                //卡屏就直接返回
+                if (islag == 1)
+                {
+                    addLog("检查到卡屏重新战斗",0);
+                    return;
+                }
+                Thread.Sleep((configInfo.atkLastTimeNum - 2) * 1000);
+            }
+            else {
+                Thread.Sleep(configInfo.atkLastTimeNum * 1000);   
+            }
+            
         }
 
         /// <summary>
@@ -193,10 +215,11 @@ namespace 大漠
         /// </summary>
         /// <param name="pics"></param>
         /// <returns></returns>
-        public List<PicInfo> FindPicList(string pics)
+        public List<PicInfo> FindPicList(string pics,string colorSimiler,double photoSimiler)
         {
             List<PicInfo> list = new List<PicInfo>();
-            string res = opTool.FindPicEx(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, "505050", 0.7, 0);
+            List<Point> pointList = new List<Point>();
+            string res = opTool.FindPicEx(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, colorSimiler, photoSimiler, 0);
             if (res.Trim() == "")
             {
                 return list;
@@ -206,10 +229,23 @@ namespace 大漠
             for (int i = 0; i < strList.Length; i++)
             {
                 PicInfo oneMonster = new PicInfo();
-                oneMonster.positionX = int.Parse(strList[i].Split(',')[1]);
-                oneMonster.positionY = int.Parse(strList[i].Split(',')[2]);
-                oneMonster.picName = picsArray[int.Parse(strList[i].Split(',')[0])];
-                list.Add(oneMonster);
+                if (int.Parse(strList[i].Split(',')[1]) + winLeftTopX < 250 && int.Parse(strList[i].Split(',')[2]) + winLeftTopY < 250)
+                {
+                    continue;
+                }
+                else {
+                    
+                    oneMonster.positionX = int.Parse(strList[i].Split(',')[1]);
+                    oneMonster.positionY = int.Parse(strList[i].Split(',')[2]);
+                    Point po = new Point();
+                    po.X = oneMonster.positionX;
+                    po.Y = oneMonster.positionY;
+                    if (!checkPointIsExit(pointList, po)) {
+                        oneMonster.picName = picsArray[int.Parse(strList[i].Split(',')[0])];
+                        list.Add(oneMonster);
+                        pointList.Add(po);
+                    }
+                }
             }
             //var picsarray = pics.Split('|');
             //for (int i = 0; i < picsarray.Length; i++)
@@ -284,6 +320,22 @@ namespace 大漠
             return list;
         }
 
+        public bool checkPointIsExit(List<Point> list, Point point)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].X + 15 > point.X
+                    && list[i].Y + 15 > point.Y
+                    && list[i].X - 15 < point.X
+                    && list[i].X - 15 < point.Y)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// 检查并使用辅助技能
         /// </summary>
@@ -339,18 +391,18 @@ namespace 大漠
                 if (outTimes >= 4) {
                     break;
                 }
-                var itemList = FindPicList(itemPics);
+                var itemList = FindPicList(itemPics, "000000", 0.8);
                 addLog("检查地上掉落的物品数量" + itemList.Count, -1);
                 if (itemList.Count < 1) {
                     break;
                 }
-               
                 for (int i = 0; i < itemList.Count; i++)
                 {
-                    addLog("捡物-" +Path.GetFileName(itemList[i].picName), 0);
+                    addLog("捡物-" + Path.GetFileName(itemList[i].picName), 0);
                     opTool.MoveTo(itemList[i].positionX, itemList[i].positionY);
-                    Thread.Sleep(3000);
                     opTool.LeftClick();
+                    Thread.Sleep(1500);
+                    break;
                 }
                 outTimes++;
             }
@@ -368,18 +420,44 @@ namespace 大漠
                     break;
                 }
                 addLog("3", -1);
-                var itemList = FindPicList(monPics);
-                addLog("发现怪物：" + itemList.Count,0);
-                if (itemList.Count < 1) {
+                Stopwatch sw = new Stopwatch();
+                sw.Start(); //计时开始
+                var itemList = FindPicList(monPics, configInfo.monsterColorSimile, configInfo.monsterSharpSimiler);
+                sw.Stop();   //计时结束
+                addLog("时间:"+(sw.ElapsedMilliseconds).ToString(),0);
+                //addLog("发现怪物：" + itemList.Count,0);
+                if (itemList.Count < 1)
+                {
                     break;
+                }
+                else { 
+                    //如果启用了怪物数量超标飞就飞
+                    if (configInfo.isCheckMonsterCountAndFly && itemList.Count >= configInfo.monsterFlyCount)
+                    {
+                        addLog("怪物数量超过" + configInfo.monsterFlyCount + "使用瞬间移动", 0);
+                        teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
+                        continue;
+                    }
                 }
                 for (int i = 0; i < 1; i++)
                 {
-                    addLog("打怪-" + Path.GetFileName(itemList[i].picName), 0);
-                    atkMonster(itemList[i].positionX, itemList[i].positionY, useSkill, key);
+                    atkMonster(itemList[i].positionX, itemList[i].positionY, useSkill, key, itemList[i].picName);
+                    //打完怪物后向右移动100像素 以免挡住捡物
+                    if (configInfo.isPickUpItem) {
+                        opTool.MoveTo(winLeftTopX + 400 + 100, winLeftTopY + 300);
+                        opTool.LeftClick();
+                        Thread.Sleep(800);
+                    }
+                    if (isHpLow())
+                    {
+                        addLog("血量过低", -1);
+                        addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                        teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
+                    }
                 }
                 outTimes++;
             }
+
         }
 
         public void start() {
@@ -408,16 +486,15 @@ namespace 大漠
                     addLog("血量过低", -1);
                     addHp(configInfo.hpUseSkill, configInfo.hpKey);
                 }
-                addLog("开始检查捡物设置", -1);
+                addLog("开始寻怪打怪", -1);
+                //寻找怪物并打怪 最多连续打四次防止卡图
+                findAndAtkMonster(configInfo.monsPic, configInfo.atkUseSkill, configInfo.atkSkillKey);
                 //有捡物设定时开始捡物
                 if (configInfo.isPickUpItem)
                 {
                     addLog("开始捡物", -1);
                     pickUpItem(configInfo.itemsPic);
                 }
-                addLog("开始寻怪打怪", -1);
-                //寻找怪物并打怪 最多连续打四次防止卡图
-                findAndAtkMonster(configInfo.monsPic, configInfo.atkUseSkill, configInfo.atkSkillKey);
                 //瞬间移动
                 teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
                 //addLog("step结束", -1);
@@ -428,6 +505,8 @@ namespace 大漠
         {
             opTool.KeyPress((int)key);    
         }
+
+        int logTime = 0;
         
         /// <summary>
         /// 增加日志
@@ -440,9 +519,15 @@ namespace 大漠
             {
                 return;
             }
+
+            if (logTime == 50) {
+                logTime = 0;
+                mssageBox.Clear();
+            }
             mssageBox.AppendText(DateTime.Now.ToString("HH:mm:ss") + " - " + msg + "\r\n");
             mssageBox.SelectionStart = mssageBox.Text.Length;
-            mssageBox.ScrollToCaret(); 
+            mssageBox.ScrollToCaret();
+            logTime++;
         }
 
 
