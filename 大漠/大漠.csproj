@@ -189,6 +189,9 @@
     <Content Include="Pic\pickup_铝原石.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Pic\pick_flag.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="test.bmp" />
   </ItemGroup>
   <ItemGroup>

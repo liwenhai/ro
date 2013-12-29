@@ -36,6 +36,7 @@ namespace 大漠
         public double monsterSharpSimiler = 0.7;
         public bool atkSkillFinishFly = false;
         public int atkFlyTimes = 4;
+        public string pickupFlagPic;
     }
 
     class PicInfo{
@@ -79,10 +80,13 @@ namespace 大漠
         int winLeftTopY;
         int winRightDownX;
         int winRightDownY;
+        int winCenterX;
+        int winCenterY;
         dmsoft opTool;
         public ConfigInfo configInfo;
         public RichTextBox mssageBox;
-        Thread thread;
+        Thread mainThread;
+        Thread hpThread;
         
         /// <summary>
         /// 构造函数
@@ -107,7 +111,9 @@ namespace 大漠
             winLeftTopX = (int)x1;
             winLeftTopY = (int)y1;
             winRightDownX = (int)x2; 
-            winRightDownY = (int)y2; 
+            winRightDownY = (int)y2;
+            winCenterX = winLeftTopX + 400;
+            winCenterY = winLeftTopY + 300;
         }
 
         
@@ -116,12 +122,12 @@ namespace 大漠
         /// 瞬间移动技能
         /// </summary>
         /// teleType=0 使用苍蝇翅膀瞬间移动 teleType=1 使用技能瞬间移动
-        public void teleport(bool useSkill,KeyEnum teleKey)
+        public void teleport()
         {
             addLog("瞬间移动", 0);
             //Thread.Sleep(1000);
-            opTool.KeyPress((int)teleKey);    
-            if(useSkill){
+            opTool.KeyPress((int)configInfo.teleSkillKey);    
+            if(configInfo.teleUseSkill){
                 Thread.Sleep((int)configInfo.teleDelayTime*1000);
                 keyPress(KeyEnum.Enter); 
             }
@@ -151,15 +157,35 @@ namespace 大漠
                 //检查是否卡屏
                 int islag = opTool.IsDisplayDead(winLeftTopX + 300, winLeftTopY + 30, winLeftTopX + 300 + 10, winLeftTopY + 30 + 10, 2);
                 //卡屏就直接返回
-                if (islag == 1)
+                //判断怪物是否在身边
+                bool isMonsterNeedByMe = false;
+
+                if (((winCenterX + 70) > monsterPostion_X)
+                   && ((winCenterX - 70) < monsterPostion_X)
+                   && ((winCenterY + 70) > monsterPostion_Y)
+                   && ((winCenterY - 70) < monsterPostion_Y))
                 {
-                    addLog("检查到卡屏重新战斗",0);
+                       isMonsterNeedByMe = true;   
+                }
+
+                if (islag == 1 && isMonsterNeedByMe==false)
+                {
+                    addLog("检查到卡屏重新战斗", 0);
                     return false;
                 }
-                Thread.Sleep((configInfo.atkLastTimeNum - 2) * 1000);
+
+                for (int i = 0; i < (configInfo.atkLastTimeNum - 2)/2; i++)
+                {
+                    if(checkItemAroundMe()){
+                        checkItemAroundMe();
+                        return false;
+                    }    
+                }
+                //Thread.Sleep( * 1000);
             }
             else {
-                Thread.Sleep(configInfo.atkLastTimeNum * 1000);   
+                Thread.Sleep(configInfo.atkLastTimeNum * 1000);
+                checkItemAroundMe();
             }
 
             return true;
@@ -178,7 +204,7 @@ namespace 大漠
 
         //鼠标移动到屏幕中央(自己角色所在位置)
         public void mouseMoveToCenter(){
-            opTool.MoveTo(winLeftTopX+400,winLeftTopY+300);    
+            opTool.MoveTo(winCenterX, winCenterY);    
         }
 
         /// <summary>
@@ -223,7 +249,7 @@ namespace 大漠
             List<PicInfo> list = new List<PicInfo>();
             List<Point> pointList = new List<Point>();
             string res = opTool.FindPicEx(winLeftTopX, winLeftTopY, winRightDownX, winRightDownY, pics, colorSimiler, photoSimiler, 0);
-            if (res.Trim() == "")
+            if (res.Trim() == "") 
             {
                 return list;
             }
@@ -359,7 +385,7 @@ namespace 大漠
                         if (itemList.Count > 1)
                         {
                             addLog("使用辅助技能时发现怪物飞", 0);
-                            teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
+                            teleport();
                         }
                         else
                         {
@@ -396,11 +422,13 @@ namespace 大漠
             {
                 addLog("Hp过低使用治愈术", 0);
                 useSkillForMe(hpKey);
+                Thread.Sleep(500);
             }
             else {
                 addLog("Hp过低使用HP药物", 0);
                 keyPress(hpKey);
-            }    
+            }
+            
         }
 
 
@@ -454,7 +482,7 @@ namespace 大漠
                     if (configInfo.isCheckMonsterCountAndFly && itemList.Count >= configInfo.monsterFlyCount)
                     {
                         addLog("怪物数量超过" + configInfo.monsterFlyCount + "使用瞬间移动", 0);
-                        teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
+                        teleport();
                         continue;
                     }
                 }
@@ -472,7 +500,7 @@ namespace 大漠
                     {
                         addLog("血量过低", -1);
                         addHp(configInfo.hpUseSkill, configInfo.hpKey);
-                        teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
+                        teleport();
                     }
                 }
                 if (isAtkSucess) {
@@ -485,42 +513,110 @@ namespace 大漠
 
         public void start() {
             addLog("开始挂机", 0);
-            thread = new Thread(new ThreadStart(processStep));
-            thread.Start();
+            mainThread = new Thread(new ThreadStart(processStep));
+            mainThread.Start();
+            hpThread = new Thread(new ThreadStart(checkHp));
+            hpThread.Start();
         }
 
         public void stop()
         {
             addLog("停止挂机", 0);
-            thread.Abort();
+            mainThread.Abort();
+            hpThread.Abort();
+        }
+
+        public void checkHp() {
+            try
+            {
+                while (true) {
+                    if (isHpLow())
+                    {
+                        try
+                        {
+                            //mainThread.Abort();
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                        addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                        addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                        addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                        teleport();
+                        //addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                    }
+                    Thread.Sleep(2000);
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+        }
+
+        public bool checkItemAroundMe() {
+            int stepHeight = 30;
+            int stepWidth = 30;
+
+            //包围距离
+            int leftMeDistance = 1;
+            int startX = winCenterX - stepWidth * leftMeDistance;
+            int startY = winCenterY - stepWidth * leftMeDistance;
+
+            for (int x = 0; x < leftMeDistance*2+1; x++)
+            {
+                for (int y = 0; y < leftMeDistance * 2 + 1; y++)
+                {
+                    opTool.MoveTo(startX + x * stepWidth, startY + y * stepHeight);
+                    Thread.Sleep(200);
+                    var pints = FindPicList(configInfo.pickupFlagPic, "101010", 1);
+                    if (pints.Count > 0) {
+                        opTool.LeftClick();
+                        Thread.Sleep(500);
+                        return true;
+                    }
+                    
+                }    
+            }
+            return false;
         }
 
         /// <summary>
         /// 挂机流程
         /// </summary>
         public void processStep() {
-            while (true) {
-                //检查并使用辅助技能
-                checkAndUesAssist(configInfo.assistItemAndSkillInfo);
-                //Hp过低时开始补血
-                addLog("开始检查血量是否过低", -1);
-                if (isHpLow())
+            try
+            {
+                while (true)
                 {
-                    addLog("血量过低", -1);
-                    addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                    //检查并使用辅助技能
+                    checkAndUesAssist(configInfo.assistItemAndSkillInfo);
+                    //Hp过低时开始补血
+                    addLog("开始检查血量是否过低", -1);
+                    if (isHpLow())
+                    {
+                        addLog("血量过低", -1);
+                        addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                        addHp(configInfo.hpUseSkill, configInfo.hpKey);
+                    }
+                    addLog("开始寻怪打怪", -1);
+                    //寻找怪物并打怪 最多连续打四次防止卡图
+                    findAndAtkMonster(configInfo.monsPic, configInfo.atkUseSkill, configInfo.atkSkillKey);
+                    //有捡物设定时开始捡物
+                    if (configInfo.isPickUpItem)
+                    {
+                        addLog("开始捡物", -1);
+                        pickUpItem(configInfo.itemsPic);
+                    }
+                    //瞬间移动
+                    teleport();
+                    //addLog("step结束", -1);
                 }
-                addLog("开始寻怪打怪", -1);
-                //寻找怪物并打怪 最多连续打四次防止卡图
-                findAndAtkMonster(configInfo.monsPic, configInfo.atkUseSkill, configInfo.atkSkillKey);
-                //有捡物设定时开始捡物
-                if (configInfo.isPickUpItem)
-                {
-                    addLog("开始捡物", -1);
-                    pickUpItem(configInfo.itemsPic);
-                }
-                //瞬间移动
-                teleport(configInfo.teleUseSkill, configInfo.teleSkillKey);
-                //addLog("step结束", -1);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
             }
         }
 

@@ -130,6 +130,7 @@ namespace 大漠
             config.monsterColorSimile = monsterColorSimileNum.Text.Trim();
             config.monsterSharpSimiler = decimal.ToDouble(monsterSharpSimilerNum.Value);
             config.atkFlyTimes = decimal.ToInt32(atkFlyTimesNum.Value);
+            config.pickupFlagPic = System.Windows.Forms.Application.StartupPath + "\\Pic\\pick_flag.bmp";
             Serialize(config);
 
             
@@ -312,6 +313,17 @@ namespace 大漠
         private void messageInfoBox_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            dmsoft opTool = new dmsoft();
+            Stopwatch sw = new Stopwatch();
+            sw.Start(); //计时开始
+            var tt = opTool.FindPicEx(0, 0, 1280, 800, System.Windows.Forms.Application.StartupPath + "\\Pic\\pick_flag.bmp", "101010", 1, 0);
+            sw.Stop();   //计时结束
+            messageInfoBox.Text = "";
+            messageInfoBox.AppendText((sw.ElapsedMilliseconds).ToString() + "毫秒\r\n" + tt + "!!\r\n"); 
         }
         
                       
